@@ -1,7 +1,7 @@
 {
   "name": "bitcoin-info",
-  "version": "1.0.2",
-  "description": "React server side rendering boilerplate",
+  "version": "1.0.0",
+  "description": "Bitcoin market news and info.",
   "main": "index.js",
   "scripts": {
     "start": "cd dist && node server",
@@ -10,19 +10,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Roilan/react-server-boilerplate"
+    "url": "https://github.com/Julious1994/bitcoin-infoe"
   },
   "keywords": [
     "react",
     "react server",
     "reactjs"
   ],
-  "author": "Roilan <roilan14@gmail.com>",
-  "license": "MIT",
+  "author": "Amit <mtpatel557@yahoo.com>",
   "bugs": {
-    "url": "https://github.com/Roilan/react-server-boilerplate/issues"
+    "url": "https://github.com/Julious1994/bitcoin-info/issues"
   },
-  "homepage": "https://github.com/Roilan/react-server-boilerplate",
+  "homepage": "https://github.com/Julious1994/bitcoin-info",
   "devDependencies": {
     "babel-core": "^6.10.4",
     "babel-loader": "^6.2.4",
