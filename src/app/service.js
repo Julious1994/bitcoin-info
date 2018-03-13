@@ -13,7 +13,6 @@ class Service {
     }
 
     fetch(url, options = {}) {
-        console.log(options);
         return fetch(url, options);
     }    
 
@@ -33,7 +32,6 @@ class Service {
     
 
     get(apiUrl) {
-        console.log('get')
         const config = {
             method: 'GET',
         };

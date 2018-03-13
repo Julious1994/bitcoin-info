@@ -1,6 +1,7 @@
 var webpack = require('webpack');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var nodeExternals = require('webpack-node-externals');
+var path = require("path");
 
 var isProduction = process.env.NODE_ENV === 'production';
 var productionPluginDefine = isProduction ? [
@@ -56,7 +57,8 @@ module.exports = [
       filename: 'bundle.js'
     },
     plugins: clientLoaders.concat([
-      new ExtractTextPlugin('index.css', {
+      new ExtractTextPlugin({
+        filename: 'css/[name].css',
         allChunks: true
       })
     ]),
@@ -66,10 +68,22 @@ module.exports = [
           test: /\.js$/,
           exclude: /node_modules/,
           loader: 'babel'
-        },
+        }
+      ],
+      rules: [
         {
-          test: /\.scss$/,
-          loader: ExtractTextPlugin.extract('css!sass')
+          test: /\.css$/,
+          use: ExtractTextPlugin.extract({
+                      use: [{
+                            loader: "css-loader"
+                          }, {
+                            loader: "sass-loader"
+                        }],
+                      // use style-loader in development
+                      fallback: "style-loader"
+                  }),
+          exclude: /node_modules/,
+          include:path.resolve(__dirname, '/app/css')
         }
       ]
     },

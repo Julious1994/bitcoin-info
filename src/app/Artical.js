@@ -2,20 +2,18 @@ import React, { Component, PropTypes } from 'react';
 
 export default class Artical extends Component {
   render() {
-    const { artical_url } = this.props;
-
+    const { artical_url, data = {}} = this.props;
+    const { artical = [] } = data;
+    const record = artical[0] || {};
     return (
       <div>
-        <h1>{artical_url}</h1>
-        <div>
-            <h3>{artical_url}</h3>
-            <p>
-                Ipsum ante nec quam gravida montes. 
-                Nunc aenean egestas lobortis blandit molestiae. 
-                Justo etiam mi. Viverra justo lectus et mattis 
-                con sem pulvinar imperdiet. Est elementum 
-                vestibulum lacus dolor tempus. Risus ipsum blandit. 
-            </p>
+        <div className="post-container">
+          <div className="post-content">
+            <h1>{record.title}</h1>
+            <div className="post-description">
+              <div dangerouslySetInnerHTML={{__html: record.content}}></div>
+            </div>
+          </div>
         </div>
       </div>
     );

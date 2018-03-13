@@ -5,7 +5,24 @@ import {
     ImageSideButton,
     Block,
     addNewBlock,
+    getCurrentBlock,
+    BLOCK_BUTTONS
 } from 'medium-draft';
+import mediumDraftExporter from 'medium-draft/lib/exporter';
+
+const ExtraButtons = [{
+    label: 'H1',
+    style: 'header-one',
+    icon: 'header',
+    description: 'Heading 1'
+  },{
+    label: 'H2',
+    style: 'header-two',
+    icon: 'header',
+    description: 'Heading 2'
+}];
+
+BLOCK_BUTTONS.splice(0, 0, ...ExtraButtons);
 
 class CustomImageSideButton extends ImageSideButton {
     
@@ -29,7 +46,7 @@ class CustomImageSideButton extends ImageSideButton {
                     this.props.setEditorState(addNewBlock(
                     this.props.getEditorState(),
                     Block.IMAGE, {
-                        src: data.url,
+                        src: '/uploads/' + data.url,
                     }
                     ));
                 }
@@ -42,12 +59,24 @@ class CustomImageSideButton extends ImageSideButton {
     
 }
 
+const headers = {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+    'X-Requested-With': 'XMLHttpRequest',
+  };
+
 export default class News extends Component {
 
   constructor(props) {
       super(props);
       this.state = {
-        editorState: createEditorState(),
+        artical: {
+            editorState: createEditorState(),
+            title: null,
+            slug_url: null,
+            seo_title: '',
+            seo_description: '',
+        },
       };
       this.sideButtons = [{
         title: 'Image',
@@ -59,32 +88,79 @@ export default class News extends Component {
     this.setState({ editorState });
   };
 
+  changeFieldValue(field, value) {
+    const { artical } = this.state;
+    artical[field] = value;
+    this.setState({ artical });
+  }
+
   componentDidMount() {
     this.refs.editor.focus();
   }
 
+  getUrlSlug(title) {
+    const slugUrl = title.toLowerCase()
+    .replace(/ /g,'-')
+    .replace(/[^\w-]+/g,'')
+    ;
+    return slugUrl;
+  }
+
+  saveArtical() {
+    const artical = Object.assign({}, this.state.artical);
+    artical.slugUrl = this.getUrlSlug(artical.title || '');
+    artical.content = mediumDraftExporter(artical.editorState.getCurrentContent())
+    artical.slug_url = artical.slugUrl;
+    delete artical.editorState;
+    delete artical.slugUrl;
+    const url = `${this.props.baseUrl}/rest/news`;
+    console.log(artical);
+    fetch(url, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+            "data": artical,
+        })
+    }).then(res => {
+        res.json().then(result => {
+            if (result.affectedRows > 0) {
+                alert("Post Inserted");
+            }
+        })
+    })
+  }
+
   render() {
-    const { news_url } = this.props;
-    const { editorState } = this.state;
-    
+    const { news_url, data } = this.props;
+    const { artical = {} } = this.state;
+    const newsList = data ? data.newsList : [];
+    console.log(newsList);
     return (
-      <div>
-            <ul>
-                <li><a href={`http://${this.props.baseUrl}/news/news-lines-1`}>News Lines #1</a></li>
-                <li><a href={`http://${this.props.baseUrl}/news/news-lines-2`}>News Lines #2</a></li>
-                <li><a href={`http://${this.props.baseUrl}/news/news-lines-3`}>News Lines #3</a></li>
-                <li><a href={`http://${this.props.baseUrl}/news/news-lines-4`}>News Lines #4</a></li>
-            </ul>
-            <div>
-                <span>Editor</span>
-                <Editor
-                    ref="editor"
-                    editorState={editorState}
-                    sideButtons={this.sideButtons}
-                    onChange={(e) => this.onChange(e)} 
-                />
-            </div>
-      </div>
+        <div style={{ marginLeft: 25}}>
+        {
+            newsList.map((news, i) => (
+
+                <div className="news-list-item" style={{ display: 'flex', }}>
+                    <div className="image-container">
+                        <img src="./uploads/download.jpeg" style={{ width: 150, height: 150}} />
+                    </div>
+                    <div className="content-container">
+                        <h3 style={{ fontSize: '14pt'}}>
+                            <a className="content-link"
+                                href={this.props.baseUrl + '/news/' + news.slug_url }
+                            >
+                                {news.title}
+                            </a>
+                        </h3>
+                        <p className="time-author">
+                            Admin | 10-Jan-2018
+                        </p>
+                        <p>{news.seo_description}</p>
+                    </div>
+                </div>
+            ))
+        }
+        </div>
     );
   }
 }
